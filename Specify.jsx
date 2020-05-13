@@ -43,6 +43,9 @@ if (app.documents.length > 0) {
     // Head & Tail
     var setHead = 6;
     var defaultHeadTail = $.getenv("Specify_defaultHeadTail") ? $.getenv("Specify_defaultHeadTail") : setHead;
+    // Head & Tail
+    var setGapSize = 4;
+    var defaultGapSize = $.getenv("Specify_defaultGapSize") ? $.getenv("Specify_defaultGapSize") : setGapSize;
     // Stroke width
     var setStroke = 0.5;
     var defaultStroke = $.getenv("Specify_defaultStroke") ? $.getenv("Specify_defaultStroke") : setStroke;
@@ -66,18 +69,14 @@ if (app.documents.length > 0) {
     // Dialog Box
     var specifyDialogBox = new Window("dialog", "Specify");
     specifyDialogBox.alignChildren = "left";
-
-    headerGroup = specifyDialogBox.add("group");
-    headerGroup.orientation = "row";
-    headerGroup.alignment = "center";
-    headerGroup.margins = [20, 0, 20, 0]; // [left, top, right, bottom]
-    specifyUpdate = headerGroup.add("statictext", undefined, "Updates & Info: https://github.com/adamdehaven/Specify");
+    specifyDialogBox.margins = [20, 20, 20, 20]; // [left, top, right, bottom]
 
     //
     // Custom Scale Panel
     // ===========================
     scalePanel = specifyDialogBox.add("panel", undefined, "SCALE");
     scalePanel.orientation = "column";
+    scalePanel.alignment = "fill";
     scalePanel.margins = 20;
     scalePanel.alignChildren = "left";
     customScaleInfo = scalePanel.add("statictext", undefined, "Define the scale of the artwork/document.");
@@ -169,6 +168,7 @@ if (app.documents.length > 0) {
     // ===========================
     optionsPanel = specifyDialogBox.add("panel", undefined, "OPTIONS");
     optionsPanel.orientation = "column";
+    optionsPanel.alignment = "fill";
     optionsPanel.margins = 20;
     optionsPanel.alignChildren = "left";
 
@@ -312,8 +312,27 @@ if (app.documents.length > 0) {
         infoText.enabled = true;
     };
     
+    // Gap between measurement lines and object
+    gapLabel = headTailGroup.add("statictext", undefined, "Gap:");
+    (gapSizeInput = headTailGroup.add("edittext", undefined, defaultGapSize)).helpTip = "Set gap size between measurement lines and object\n\nDefault: " + setGapSize;
+    gapSizeInput.characters = 3;
+
+    gapSizeInput.onChange = function() {
+        gapSizeInput.text = gapSizeInput.text.replace(/[^0-9.]/g, "");
+        restoreDefaultsButton.enabled = true;
+        infoText.enabled = true;
+    };
+    gapSizeInput.onDeactivate = function() {
+        // If first character is decimal point, don't error, but instead
+        // add leading zero to string.
+        if (gapSizeInput.text.charAt(0) == ".") {
+            gapSizeInput.text = "0" + gapSizeInput.text;
+            gapSizeInput.active = true;
+        }
+    }
+
     // Stroke Width
-    strokeLabel = headTailGroup.add("statictext", undefined, "Stroke width:");
+    strokeLabel = headTailGroup.add("statictext", undefined, "Stroke:");
     (strokeInput = headTailGroup.add("edittext", undefined, defaultStroke)).helpTip = "Set width of stroke measurement lines\n\nDefault: " + setStroke;
     strokeInput.characters = 3;
 
@@ -334,7 +353,7 @@ if (app.documents.length > 0) {
     // Add decimal places box
     decimalPlacesGroup = optionsPanel.add("group");
     decimalPlacesGroup.orientation = "row";
-    decimalPlacesLabel = decimalPlacesGroup.add("statictext", undefined, "Num. of decimal places displayed:");
+    decimalPlacesLabel = decimalPlacesGroup.add("statictext", undefined, "Decimals:"); // Num. of decimal places displayed:
     (decimalPlacesInput = decimalPlacesGroup.add("edittext", undefined, defaultDecimals)).helpTip = "Enter the desired number of decimal places to\ndisplay in the label dimensions.\n\nDefault: " + setDecimals;
     decimalPlacesInput.characters = 4;
     decimalPlacesInput.onActivate = function() {
@@ -356,8 +375,12 @@ if (app.documents.length > 0) {
         }
     };
 
+    // Custom Units box
+    customUnitsGroup = optionsPanel.add("group");
+    customUnitsGroup.orientation = "row";
+
     // Add options panel checkboxes
-    (useCustomUnits = optionsPanel.add("checkbox", undefined, "Customize Units Label")).helpTip = "When checked, allows user to customize\nthe text of the units label.\nExample: ft";
+    (useCustomUnits = customUnitsGroup.add("checkbox", undefined, "Customize Units Label")).helpTip = "When checked, allows user to customize\nthe text of the units label.\nExample: ft";
     useCustomUnits.value = defaultUseCustomUnits;
     useCustomUnits.onClick = function() {
         if (useCustomUnits.value == true) {
@@ -369,12 +392,12 @@ if (app.documents.length > 0) {
     };
 
     // Custom Units box
-    customUnitsGroup = optionsPanel.add("group");
-    customUnitsGroup.orientation = "row";
-    customUnitsLabel = customUnitsGroup.add("statictext", undefined, "Custom Units Label:");
+    // customUnitsGroup = optionsPanel.add("group");
+    // customUnitsGroup.orientation = "row";
+    // customUnitsLabel = customUnitsGroup.add("statictext", undefined, "Custom Units Label:");
     (customUnitsInput = customUnitsGroup.add("edittext", undefined, defaultCustomUnits)).helpTip = "Enter the string to display after the dimension \nnumber when using a custom scale.\n\nDefault: " + setCustomUnits;
     customUnitsInput.enabled = defaultUseCustomUnits;
-    customUnitsInput.characters = 20;
+    customUnitsInput.characters = 8;
     customUnitsInput.onChange = function() {
         restoreDefaultsButton.enabled = true;
         infoText.enabled = true;
@@ -386,6 +409,7 @@ if (app.documents.length > 0) {
     // ===========================
     defaultsPanel = specifyDialogBox.add("panel", undefined, "RESTORE DEFAULTS");
     defaultsPanel.orientation = "column";
+    defaultsPanel.alignment = "fill";
     defaultsPanel.margins = 20;
     defaultsPanel.alignChildren = "left";
 
@@ -398,7 +422,7 @@ if (app.documents.length > 0) {
     // Reset options button
     restoreDefaultsButton = defaultsPanel.add("button", undefined, "Restore Defaults");
     restoreDefaultsButton.alignment = "left";
-    restoreDefaultsButton.enabled = (setFontSize != defaultFontSize || setRed != defaultColorRed || setGreen != defaultColorGreen || setBlue != defaultColorBlue || setHead != defaultHeadTail || setStroke != defaultStroke || setDecimals != defaultDecimals || setScale != defaultScale || setCustomUnits != defaultCustomUnits ? true : false);
+    restoreDefaultsButton.enabled = (setFontSize != defaultFontSize || setRed != defaultColorRed || setGreen != defaultColorGreen || setBlue != defaultColorBlue || setHead != defaultHeadTail || setGapSize != defaultGapSize || setStroke != defaultStroke || setDecimals != defaultDecimals || setScale != defaultScale || setCustomUnits != defaultCustomUnits ? true : false);
     restoreDefaultsButton.onClick = function() {
         restoreDefaults();
     };
@@ -410,6 +434,7 @@ if (app.documents.length > 0) {
         colorInputGreen = setGreen;
         colorInputBlue = setBlue;
         headTailInput.text = setHead;
+        gapSizeInput.text = setGapSize;
         strokeInput.text = setStroke;
         decimalPlacesInput.text = setDecimals;
         customScaleDropdown.selection = setScale;
@@ -424,8 +449,9 @@ if (app.documents.length > 0) {
         $.setenv("Specify_defaultColorRed", "");
         $.setenv("Specify_defaultColorGreen", "");
         $.setenv("Specify_defaultColorBlue", "");
-        $.setenv("Specify_defaultStroke", "");
         $.setenv("Specify_defaultHeadTail", "");
+        $.setenv("Specify_defaultGapSize", "");
+        $.setenv("Specify_defaultStroke", "");
         $.setenv("Specify_defaultDecimals", "");
         $.setenv("Specify_defaultScale", "");
         $.setenv("Specify_defaultUseCustomUnits", "");
@@ -443,7 +469,7 @@ if (app.documents.length > 0) {
     buttonGroup = specifyDialogBox.add("group");
     buttonGroup.orientation = "row";
     buttonGroup.alignment = "right";
-    buttonGroup.margins = [20, 0, 20, 20]; // [left, top, right, bottom]
+    buttonGroup.margins = [20, 0, 0, 0]; // [left, top, right, bottom]
 
     // Cancel button
     cancelButton = buttonGroup.add("button", undefined, "Cancel");
@@ -458,6 +484,18 @@ if (app.documents.length > 0) {
     specifyButton.onClick = function() {
         startSpec();
     };
+
+    //
+    // Footer Group
+    // ===========================
+
+    // footerGroup = specifyDialogBox.add("group");
+    // footerGroup.orientation = "row";
+    // footerGroup.alignment = "center";
+    // footerGroup.margins = [10, 0, 0, 0]; // [left, top, right, bottom]
+
+    // // Updates & Info
+    // specifyUpdate = footerGroup.add("statictext", undefined, "https://github.com/adamdehaven/Specify"); // Updates & Info:  removed makes it less wide 
 
     //
     // ===========================
@@ -482,8 +520,8 @@ if (app.documents.length > 0) {
     // Declare global scale var
     var scale;
 
-    // Gap between measurement lines and object
-    var gap = 4;
+    // // Gap between measurement lines and object
+    // var gap = 4;
 
     // Size of perpendicular measurement lines.
     // var size = 6;
@@ -548,6 +586,12 @@ if (app.documents.length > 0) {
             $.setenv("Specify_defaultHeadTail", size);
         }
         
+        var validGap = /^[0-9]{1,3}(\.[0-9]{1,3})?$/.test(gapSizeInput.text);
+        if (validGap) {
+            gap = parseInt(gapSizeInput.text);
+            $.setenv("Specify_defaultGapSize", gap);
+        }
+        
         var validWidth = /^[0-9]{1,3}(\.[0-9]{1,3})?$/.test(strokeInput.text);
         if (validWidth) {
             strWidth = parseFloat(strokeInput.text);
@@ -555,7 +599,6 @@ if (app.documents.length > 0) {
         }
 
         var validDecimalPlaces = /^[0-4]{1}$/.test(decimalPlacesInput.text);
-        alert(validDecimalPlaces)
         if (validDecimalPlaces) {
             // Number of decimal places in measurement
             decimals = decimalPlacesInput.text;
@@ -600,6 +643,12 @@ if (app.documents.length > 0) {
             alert("Please enter a valid number for head & tail.");
             headTailInput.active = true;
             headTailInput.text = setHead;
+        } else if (!validGap) {
+            // If inputs are not numeric
+            beep();
+            alert("Please enter a valid number for gap size.");
+            gapSizeInput.active = true;
+            gapSizeInput.text = setGapSize;
         } else if (!validWidth) {
             // If inputs are not numeric
             beep();
