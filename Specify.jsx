@@ -163,6 +163,12 @@ if (app.documents.length > 0) {
         }
     };
 
+    // If exactly 2 objects are selected, give user option to dimension BETWEEN them
+    if (selectedItems == 2) {
+        (between = dimensionPanel.add("checkbox", undefined, "Dimension between selected")).helpTip = "When checked, return the distance between\nthe 2 objects for the selected dimensions.";
+        between.value = false;
+    }
+
     //
     // Options Panel
     // ===========================
@@ -171,12 +177,6 @@ if (app.documents.length > 0) {
     optionsPanel.alignment = "fill";
     optionsPanel.margins = 20;
     optionsPanel.alignChildren = "left";
-
-    // If exactly 2 objects are selected, give user option to dimension BETWEEN them
-    if (selectedItems == 2) {
-        (between = optionsPanel.add("checkbox", undefined, "Dimension between selected objects")).helpTip = "When checked, return the distance between\nthe 2 objects for the selected dimensions.";
-        between.value = false;
-    }
 
     // Add font-size box
     fontGroup = optionsPanel.add("group");
@@ -704,6 +704,56 @@ if (app.documents.length > 0) {
         // a direction flag for placing the measurement lines.
         var dir = 1;
 
+        // Convert gap (px) size to RulerUnits
+        var gapUnit = convertToGap(gap, "px");
+        function convertToGap(value, unit) {
+            switch (doc.rulerUnits) {
+                case RulerUnits.Picas:
+                    value = new UnitValue(value, "pc").as(unit);
+                    break;
+                case RulerUnits.Inches:
+                    value = new UnitValue(value, "in").as(unit);
+                    break;
+                case RulerUnits.Millimeters:
+                    value = new UnitValue(value, "mm").as(unit);
+                    break;
+                case RulerUnits.Centimeters:
+                    value = new UnitValue(value, "cm").as(unit);
+                    break;
+                case RulerUnits.Pixels:
+                    value = new UnitValue(value, "px").as(unit);
+                    break;
+                default:
+                    value = new UnitValue(value, unit).as(unit);
+            }
+            return value;
+        };
+
+        // Convert size (px) size to RulerUnits
+        var sizeUnit = convertToGap(size, "px");
+        function convertToGap(value, unit) {
+            switch (doc.rulerUnits) {
+                case RulerUnits.Picas:
+                    value = new UnitValue(value, "pc").as(unit);
+                    break;
+                case RulerUnits.Inches:
+                    value = new UnitValue(value, "in").as(unit);
+                    break;
+                case RulerUnits.Millimeters:
+                    value = new UnitValue(value, "mm").as(unit);
+                    break;
+                case RulerUnits.Centimeters:
+                    value = new UnitValue(value, "cm").as(unit);
+                    break;
+                case RulerUnits.Pixels:
+                    value = new UnitValue(value, "px").as(unit);
+                    break;
+                default:
+                    value = new UnitValue(value, unit).as(unit);
+            }
+            return value;
+        };
+        
         switch (where) {
             case "Top":
                 a = bound[0];
@@ -742,14 +792,14 @@ if (app.documents.length > 0) {
         if (xy == "x") {
 
             // 2 vertical lines
-            lines[0] = new Array(new Array(a, c + (gap) * dir));
-            lines[0].push(new Array(a, c + (gap + size) * dir));
-            lines[1] = new Array(new Array(b, c + (gap) * dir));
-            lines[1].push(new Array(b, c + (gap + size) * dir));
+            lines[0] = new Array(new Array(a, c + (gapUnit) * dir));
+            lines[0].push(new Array(a, c + (gapUnit + sizeUnit) * dir));
+            lines[1] = new Array(new Array(b, c + (gapUnit) * dir));
+            lines[1].push(new Array(b, c + (gapUnit + sizeUnit) * dir));
 
             // 1 horizontal line
-            lines[2] = new Array(new Array(a, c + (gap + size / 2) * dir));
-            lines[2].push(new Array(b, c + (gap + size / 2) * dir));
+            lines[2] = new Array(new Array(a, c + (gapUnit + sizeUnit / 2) * dir));
+            lines[2].push(new Array(b, c + (gapUnit + sizeUnit / 2) * dir));
 
             // Create text label
             if (where == "Top") {
@@ -757,7 +807,7 @@ if (app.documents.length > 0) {
                 t.top += t.height;
             } else {
                 var t = specLabel(w, (a + b) / 2, lines[0][0][1], color);
-                t.top -= size;
+                t.top -= sizeUnit;
             }
             t.left -= t.width / 2;
 
@@ -765,14 +815,14 @@ if (app.documents.length > 0) {
             // Vertical measurement
 
             // 2 horizontal lines
-            lines[0] = new Array(new Array(c + (gap) * dir, a));
-            lines[0].push(new Array(c + (gap + size) * dir, a));
-            lines[1] = new Array(new Array(c + (gap) * dir, b));
-            lines[1].push(new Array(c + (gap + size) * dir, b));
+            lines[0] = new Array(new Array(c + (gapUnit) * dir, a));
+            lines[0].push(new Array(c + (gapUnit + sizeUnit) * dir, a));
+            lines[1] = new Array(new Array(c + (gapUnit) * dir, b));
+            lines[1].push(new Array(c + (gapUnit + sizeUnit) * dir, b));
 
             //1 vertical line
-            lines[2] = new Array(new Array(c + (gap + size / 2) * dir, a));
-            lines[2].push(new Array(c + (gap + size / 2) * dir, b));
+            lines[2] = new Array(new Array(c + (gapUnit + sizeUnit / 2) * dir, a));
+            lines[2].push(new Array(c + (gapUnit + sizeUnit / 2) * dir, b));
 
             // Create text label
             if (where == "Left") {
@@ -884,7 +934,7 @@ if (app.documents.length > 0) {
         }
 
         // Convert font size to RulerUnits
-        var labelFontInUnits = convertToPoints(labelFontSize);
+        var labelFontInUnits = convertToPoints(labelFontSize, "pt");
 
         // Set environmental variable
         $.setenv("Specify_defaultFontSize", labelFontInUnits);
