@@ -33,7 +33,7 @@ File > Scripts > Other Script...
 #### Specify Dialog
 After choosing to run the script, you will be presented with a dialog that allows you to choose which dimension(s) to specify. The dialog also allows you to edit the default options. **Any changes to the options panel will persist until you close the application (even if you run the script in another document).**
 
-![Specify dialog example](specify-dialog.png)
+![Specify dialog example](https://raw.githubusercontent.com/adamdehaven/Specify/master/assets/specify-dialog.png)
 
 #### Dimension Single or Multiple Objects
 Select a single object (or group) or multiple objects on your artboard and [run the script](#how-to-run) within Illustrator.
@@ -53,7 +53,7 @@ The script automatically dimensions objects based on the Document's default unit
 > 1. In your document, select show Rulers via `View > Rulers > Show Rulers` ( <kbd>⌘Cmd</kbd> + <kbd>R</kbd> on Mac, <kbd>Ctrl</kbd> + <kbd>R</kbd> on PC )
 > 2. Right click on the Ruler, and select your desired units. Otherwise, the script will use the Document's selected units by default.
 > 3. Run the script and you will now get output as shown in the example below
-![specify-example](https://raw.githubusercontent.com/adamdehaven/Specify/master/specify-example.jpg)
+![specify-example](https://raw.githubusercontent.com/adamdehaven/Specify/master/assets/specify-example.jpg)
 
 The units label is optional. A checkbox is included in the Specify dialog box that allows the user to turn the units label on or off.
 ##### Examples
@@ -64,4 +64,4 @@ Units Label Off:
 > **220.00**
 
 #### Example
-![specify-workplace-example](https://raw.githubusercontent.com/adamdehaven/Specify/master/specify-workplace-example.jpg)
+![specify-workplace-example](https://raw.githubusercontent.com/adamdehaven/Specify/master/assets/specify-workplace-example.jpg)
