@@ -8,8 +8,6 @@
  * https://adamdehaven.com
  * @adamdehaven
  *
- * Additional info:
- * https://adamdehaven.com/blog/dimension-adobe-illustrator-designs-with-a-simple-script/
  * ====================
  */
 
@@ -224,16 +222,26 @@ if (app.documents.length > 0) {
     var customScaleLabel = customScaleGroup.add("statictext", undefined, undefined, { name: "customScaleLabel" });
     customScaleLabel.text = "Scale:";
 
-    var customScaleDropdown = customScaleGroup.add("dropdownlist", undefined, undefined, { name: "customScaleDropdown" });
-    customScaleDropdown.helpTip = "Choose the scale of the artwork/document.\n\nExample: Choosing '1/4' will indicate the artwork is drawn at\none-fourth scale, resulting in dimension values that are 4x their\ndrawn dimensions.\n\nDefault: 1/1";
+    var customScaleDropdown_array = [];
     for (var n = 1; n <= 30; n++) {
         if (n == 1) {
-            customScaleDropdown.add("item", "1/" + n + "    (Default)");
-            customScaleDropdown.add("separator");
+            customScaleDropdown_array.push("1/" + n + "    (Default)");
+            customScaleDropdown_array.push("-");
         } else {
-            customScaleDropdown.add("item", "1/" + n);
+            customScaleDropdown_array.push("1/" + n);
         }
     }
+
+    var customScaleDropdown = customScaleGroup.add("dropdownlist", undefined, undefined, { name: "customScaleDropdown", items: customScaleDropdown_array });
+    customScaleDropdown.helpTip = "Choose the scale of the artwork/document.\n\nExample: Choosing '1/4' will indicate the artwork is drawn at\none-fourth scale, resulting in dimension values that are 4x their\ndrawn dimensions.\n\nDefault: 1/1";
+    // for (var n = 1; n <= 30; n++) {
+    //     if (n == 1) {
+    //         customScaleDropdown.add("item", "1/" + n + "    (Default)");
+    //         customScaleDropdown.add("separator");
+    //     } else {
+    //         customScaleDropdown.add("item", "1/" + n);
+    //     }
+    // }
     customScaleDropdown.selection = defaultScale;
     customScaleDropdown.onChange = function () {
         restoreDefaultsButton.enabled = true;
@@ -518,10 +526,45 @@ if (app.documents.length > 0) {
     updatesGroup.margins = 0;
 
     var specifyUpdatesText = updatesGroup.add("statictext", undefined, undefined, { name: "specifyUpdatesText" });
-    specifyUpdatesText.text = "For updates & more info:";
+    specifyUpdatesText.text = "For updates & more info:";    
 
-    var urlInput = updatesGroup.add('edittext {justify: "center", properties: {name: "urlInput", readonly: true}}');
-    urlInput.text = "https://github.com/adamdehaven/Specify";
+    var urlButton = updatesGroup.add("button", undefined, undefined, {name: "urlButton"}); 
+    urlButton.text = "https://github.com/adamdehaven/Specify"; 
+    urlButton.alignment = ["center","center"]; 
+    urlButton.onClick = function () {
+        openURL(urlButton.text);
+    };
+    
+    function openURL(url) {
+        if (!url) {
+            return
+        }
+    
+        try {
+            if (app.version > 6) {
+                if (File.fs == "Macintosh") {
+                    var body = 'tell application "Finder"\ropen location "' + url + '"\rend tell';
+                    app.doScript(body, ScriptLanguage.APPLESCRIPT_LANGUAGE);
+                } else {
+                    var body = 'dim objShell\rset objShell = CreateObject("Shell.Application")\rstr = "' + url + '"\robjShell.ShellExecute str, "", "", "open", 1 '
+                    app.doScript(body, ScriptLanguage.VISUAL_BASIC);
+                }
+            } else {
+                linkJumper = File(Folder.temp.absoluteURI + "/link.html");
+                linkJumper.open("w");
+                var linkBody = '<html><head><META HTTP-EQUIV=Refresh CONTENT="0; URL=' + url + '"></head><body> <p></body></html>'
+                linkJumper.write(linkBody);
+                linkJumper.close();
+                linkJumper.execute();
+            }
+        } catch (e) {
+            beep();
+            prompt("Open your browser and visit the URL below for more information", url);
+        } finally {
+            urlButton.active = true;
+            urlButton.active = false;
+        }
+    };
 
     // BUTTONGROUP
     // ===========
@@ -540,7 +583,6 @@ if (app.documents.length > 0) {
     var specifyButton = buttonGroup.add("button", undefined, undefined, { name: "specifyButton" });
     specifyButton.text = "Specify Object(s)";
     specifyButton.preferredSize.height = 40;
-    // specifyDialogBox.defaultElement = specifyButton;
     specifyButton.onClick = function () {
         startSpec();
     };
