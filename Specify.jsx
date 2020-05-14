@@ -35,18 +35,18 @@ if (app.documents.length > 0) {
     var setFontSize = 8;
     var defaultFontSize = $.getenv("Specify_defaultFontSize") ? convertToUnits($.getenv("Specify_defaultFontSize")).toFixed(3) : setFontSize;
     // Colors Label
-    var setLabelRed = 36;
+    var setLabelRed = 57; //36;
     var defaultLabelColorRed = $.getenv("Specify_defaultLabelColorRed") ? $.getenv("Specify_defaultLabelColorRed") : setLabelRed;
-    var setLabelGreen = 151;
+    var setLabelGreen = 140; //151;
     var defaultLabelColorGreen = $.getenv("Specify_defaultLabelColorGreen") ? $.getenv("Specify_defaultLabelColorGreen") : setLabelGreen;
-    var setLabelBlue = 227;
+    var setLabelBlue = 242; //227;
     var defaultLabelColorBlue = $.getenv("Specify_defaultLabelColorBlue") ? $.getenv("Specify_defaultLabelColorBlue") : setLabelBlue;
      // Colors Lines
-    var setLinesRed = 36;
+    var setLinesRed =  57; //36;
     var defaultLinesColorRed = $.getenv("Specify_defaultLinesColorRed") ? $.getenv("Specify_defaultLinesColorRed") : setLinesRed;
-    var setLinesGreen = 151;
+    var setLinesGreen = 140; //151;
     var defaultLinesColorGreen = $.getenv("Specify_defaultLinesColorGreen") ? $.getenv("Specify_defaultLinesColorGreen") : setLinesGreen;
-    var setLinesBlue = 227;
+    var setLinesBlue = 242; //227;
     var defaultLinesColorBlue = $.getenv("Specify_defaultLinesColorBlue") ? $.getenv("Specify_defaultLinesColorBlue") : setLinesBlue;
     // Head & Tail
     var setHead = 6;
