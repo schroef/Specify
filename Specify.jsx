@@ -251,9 +251,9 @@ if (app.documents.length > 0) {
     var resultColor = colRGB.toString();
     var colorSet = false;
     function setColor(resultColor) {
-        var Red = resultColor[0] * 255;
-        var Green = resultColor[1] * 255;
-        var Blue = resultColor[2] * 255;
+        var Red = Math.round(resultColor[0] * 255);
+        var Green = Math.round(resultColor[1] * 255);
+        var Blue = Math.round(resultColor[2] * 255);
         colorInputRed = Red.toString();
         colorInputGreen = Green.toString();
         colorInputBlue = Blue.toString();
