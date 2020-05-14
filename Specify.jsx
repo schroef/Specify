@@ -35,11 +35,11 @@ if (app.documents.length > 0) {
     var setFontSize = 8;
     var defaultFontSize = $.getenv("Specify_defaultFontSize") ? convertToUnits($.getenv("Specify_defaultFontSize")).toFixed(3) : setFontSize;
     // Colors
-    var setRed = 36;
+    var setRed = 57; //36;
     var defaultColorRed = $.getenv("Specify_defaultColorRed") ? $.getenv("Specify_defaultColorRed") : setRed;
-    var setGreen = 151;
+    var setGreen = 140; //151;
     var defaultColorGreen = $.getenv("Specify_defaultColorGreen") ? $.getenv("Specify_defaultColorGreen") : setGreen;
-    var setBlue = 227;
+    var setBlue = 242; //227;
     var defaultColorBlue = $.getenv("Specify_defaultColorBlue") ? $.getenv("Specify_defaultColorBlue") : setBlue;
     // Head & Tail
     var setHead = 6;
