@@ -14,8 +14,9 @@
  */
 
 // Import colorPicker script
- var ScriptFilePath = Folder($.fileName).parent.fsName ; 
+var ScriptFilePath = Folder($.fileName).parent.fsName ; 
 $.evalFile(new File(ScriptFilePath + '/colorPicker.inc'));
+
 
 if (app.documents.length > 0) {
 
@@ -260,7 +261,7 @@ if (app.documents.length > 0) {
     }
     colorBtn.onClick = function() {
         colorSet = true;
-        resultColor = colorPicker();
+        resultColor = colorPicker(colRGB);
         colorBtn.fillBrush = colorBtn.graphics.newBrush(colorBtn.graphics.BrushType.SOLID_COLOR, resultColor);
         colorBtn.text = "";
         colorBtn.onDraw = customDraw;
