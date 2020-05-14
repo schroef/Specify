@@ -34,13 +34,20 @@ if (app.documents.length > 0) {
     // Font Size
     var setFontSize = 8;
     var defaultFontSize = $.getenv("Specify_defaultFontSize") ? convertToUnits($.getenv("Specify_defaultFontSize")).toFixed(3) : setFontSize;
-    // Colors
-    var setRed = 36;
-    var defaultColorRed = $.getenv("Specify_defaultColorRed") ? $.getenv("Specify_defaultColorRed") : setRed;
-    var setGreen = 151;
-    var defaultColorGreen = $.getenv("Specify_defaultColorGreen") ? $.getenv("Specify_defaultColorGreen") : setGreen;
-    var setBlue = 227;
-    var defaultColorBlue = $.getenv("Specify_defaultColorBlue") ? $.getenv("Specify_defaultColorBlue") : setBlue;
+    // Colors Label
+    var setLabelRed = 36;
+    var defaultLabelColorRed = $.getenv("Specify_defaultLabelColorRed") ? $.getenv("Specify_defaultLabelColorRed") : setLabelRed;
+    var setLabelGreen = 151;
+    var defaultLabelColorGreen = $.getenv("Specify_defaultLabelColorGreen") ? $.getenv("Specify_defaultLabelColorGreen") : setLabelGreen;
+    var setLabelBlue = 227;
+    var defaultLabelColorBlue = $.getenv("Specify_defaultLabelColorBlue") ? $.getenv("Specify_defaultLabelColorBlue") : setLabelBlue;
+     // Colors Lines
+    var setLinesRed = 36;
+    var defaultLinesColorRed = $.getenv("Specify_defaultLinesColorRed") ? $.getenv("Specify_defaultLinesColorRed") : setLinesRed;
+    var setLinesGreen = 151;
+    var defaultLinesColorGreen = $.getenv("Specify_defaultLinesColorGreen") ? $.getenv("Specify_defaultLinesColorGreen") : setLinesGreen;
+    var setLinesBlue = 227;
+    var defaultLinesColorBlue = $.getenv("Specify_defaultLinesColorBlue") ? $.getenv("Specify_defaultLinesColorBlue") : setLinesBlue;
     // Head & Tail
     var setHead = 6;
     var defaultHeadTail = $.getenv("Specify_defaultHeadTail") ? $.getenv("Specify_defaultHeadTail") : setHead;
@@ -78,10 +85,12 @@ if (app.documents.length > 0) {
     scalePanel = specifyDialogBox.add("panel", undefined, "SCALE");
     scalePanel.orientation = "column";
     scalePanel.alignment = "fill";
-    scalePanel.margins = 20;
+    scalePanel.margins = 16;
+    scalePanel.spacing = 8;
     scalePanel.alignChildren = "left";
-    customScaleInfo = scalePanel.add("statictext", undefined, "Define the scale of the artwork/document.");
-    customScaleInfo2 = scalePanel.add("statictext", undefined, "Example: 250 units at 1/4 scale displays as 1000");
+    customScaleInfo = scalePanel.add("statictext", undefined, "Define the scale of the artwork/document. Example: 250 units at 1/4 scale displays as 1000", {multiline:true});
+    customScaleInfo.preferredSize.width = 250; 
+    // customScaleInfo2 = scalePanel.add("statictext", undefined, "Example: 250 units at 1/4 scale displays as 1000");
 
     // Scale multiplier box
     customScaleGroup = scalePanel.add("group");
@@ -171,17 +180,19 @@ if (app.documents.length > 0) {
     }
 
     //
-    // Options Panel
+    // Labels Panel
     // ===========================
-    optionsPanel = specifyDialogBox.add("panel", undefined, "OPTIONS");
-    optionsPanel.orientation = "column";
-    optionsPanel.alignment = "fill";
-    optionsPanel.margins = 20;
-    optionsPanel.alignChildren = "left";
+    labelsPanel = specifyDialogBox.add("panel", undefined, "LABELS / LINES");
+    labelsPanel.orientation = "column";
+    labelsPanel.alignment = "fill";
+    labelsPanel.margins = 16;
+    labelsPanel.spacing = 8;
+    labelsPanel.alignChildren = "left";
 
     // Add font-size box
-    fontGroup = optionsPanel.add("group");
+    fontGroup = labelsPanel.add("group");
     fontGroup.orientation = "row";
+    fontGroup.spacing = 5;
     fontLabel = fontGroup.add("statictext", undefined, "Font size:");
     (fontSizeInput = fontGroup.add("edittext", undefined, defaultFontSize)).helpTip = "Enter the desired font size for the dimension label(s). If value is less than one (e.g. 0.25) you must include a leading zero before the decimal point.\n\nDefault: " + setFontSize;
     fontUnitsLabelText = "";
@@ -218,12 +229,8 @@ if (app.documents.length > 0) {
             fontSizeInput.active = true;
         }
     }
-    // Add Color Group
-    colorGroup = optionsPanel.add("group");
-    colorGroup.orientation = "row";
-    colorLabel = colorGroup.add("statictext", undefined, "Label color:");
 
-    // Color Pickr
+    // Custom background Buttons
     function customDraw() {
         with(this) {
             graphics.drawOSControl();
@@ -233,127 +240,61 @@ if (app.documents.length > 0) {
         }
     }
 
-    var colorBtn = colorGroup.add('iconbutton', undefined, undefined, {
-        name: 'colorBtn',
+    // Refresh Panel
+    function updatePanel(win) {
+        specifyDialogBox.layout.layout(true);
+    }
+
+    // Add Color Label Group
+    colLabelGroup = fontGroup.add("group");
+    colLabelGroup.orientation = "row";
+    colLabel = colLabelGroup.add("statictext", undefined, "");
+    
+    var colLabelBtn = colLabelGroup.add('iconbutton', undefined, undefined, {
+        name: 'colLabelBtn',
         style: 'toolbutton'
     });
-    colorBtn.size = [135, 20];
-    var colRGB = [(parseInt(defaultColorRed)/255), (parseInt(defaultColorGreen)/255), (parseInt(defaultColorBlue)/255)];
-    colorBtn.fillBrush = colorBtn.graphics.newBrush(colorBtn.graphics.BrushType.SOLID_COLOR, colRGB, 1);
-    colorBtn.text = "click";
-    colorBtn.textPen = colorBtn.graphics.newPen(colorBtn.graphics.PenType.SOLID_COLOR, [1, 1, 1], 1);
-    colorBtn.onDraw = customDraw;
-    colorBtn.helpTip = "Set a color to use for dimension label(s).";
+    colLabelBtn.size = [70, 20];
+    var colLabelRGB = [(parseInt(defaultLabelColorRed)/255), (parseInt(defaultLabelColorGreen)/255), (parseInt(defaultLabelColorBlue)/255)];
+    colLabelBtn.fillBrush = colLabelBtn.graphics.newBrush(colLabelBtn.graphics.BrushType.SOLID_COLOR, colLabelRGB, 1);
+    // colLabelBtn.text = "click";
+    colLabelBtn.textPen = colLabelBtn.graphics.newPen(colLabelBtn.graphics.PenType.SOLID_COLOR, [1, 1, 1], 1);
+    colLabelBtn.onDraw = customDraw;
+    colLabelBtn.helpTip = "Set a color to use for dimension label(s).";
 
-    var colorInputRed = defaultColorRed;
-    var colorInputGreen = defaultColorGreen;
-    var colorInputBlue = defaultColorBlue;
-    var resultColor = colRGB.toString();
-    var colorSet = false;
-    function setColor(resultColor) {
-        var Red = resultColor[0] * 255;
-        var Green = resultColor[1] * 255;
-        var Blue = resultColor[2] * 255;
-        colorInputRed = Red.toString();
-        colorInputGreen = Green.toString();
-        colorInputBlue = Blue.toString();
-        return [colorInputRed,colorInputGreen,colorInputBlue] 
+    var colLabelInputRed = defaultLabelColorRed;
+    var colLabelInputGreen = defaultLabelColorGreen;
+    var colLabelInputBlue = defaultLabelColorBlue;
+    var resultLabelColor = colLabelRGB.toString();
+    var colLabelSet = false;
+
+    function setLabelColor(resultLabelColor) {
+        var Red = Math.round(resultLabelColor[0] * 255);
+        var Green = Math.round(resultLabelColor[1] * 255);
+        var Blue = Math.round(resultLabelColor[2] * 255);
+        colLabelInputRed = Red.toString();
+        colLabelInputGreen = Green.toString();
+        colLabelInputBlue = Blue.toString();
+        return [colLabelInputRed,colLabelInputGreen,colLabelInputBlue] 
     }
-    colorBtn.onClick = function() {
-        colorSet = true;
-        resultColor = colorPicker(colRGB);
-        colorBtn.fillBrush = colorBtn.graphics.newBrush(colorBtn.graphics.BrushType.SOLID_COLOR, resultColor);
-        colorBtn.text = "";
-        colorBtn.onDraw = customDraw;
+
+    colLabelBtn.onClick = function() {
+        colLabelSet = true;
+        resultLabelColor = colorPicker(colLabelRGB);
+        colLabelBtn.fillBrush = colLabelBtn.graphics.newBrush(colLabelBtn.graphics.BrushType.SOLID_COLOR, resultLabelColor);
+        colLabelBtn.text = "";
+        colLabelBtn.onDraw = customDraw;
         // specifyDialogBox.update();
         updatePanel(specifyDialogBox);
         // app.refresh();
         restoreDefaultsButton.enabled = true;
         infoText.enabled = true;
     }
-    
-    function updatePanel(win) {
-        specifyDialogBox.layout.layout(true);
-    }
-
-    colorInputRed.onActivate = function() {
-        restoreDefaultsButton.enabled = true;
-        infoText.enabled = true;
-    };
-    colorInputRed.onChange = function() {
-        colorInputRed.text = colorInputRed.text.replace(/[^0-9]/g, "");
-    };
-
-    colorInputGreen.onActivate = function() {
-        restoreDefaultsButton.enabled = true;
-        infoText.enabled = true;
-    };
-    colorInputGreen.onChange = function() {
-        colorInputGreen.text = colorInputGreen.text.replace(/[^0-9]/g, "");
-    };
-
-    colorInputBlue.onActivate = function() {
-        restoreDefaultsButton.enabled = true;
-        infoText.enabled = true;
-    };
-    colorInputBlue.onChange = function() {
-        colorInputBlue.text = colorInputBlue.text.replace(/[^0-9]/g, "");
-    };
-
-    // Size measurement head
-    headTailGroup = optionsPanel.add("group");
-    headTailGroup.orientation = "row";
-    headTailLabel = headTailGroup.add("statictext", undefined, "Head & Tail:");
-    (headTailInput = headTailGroup.add("edittext", undefined, defaultHeadTail)).helpTip = "Set size of measurement head & tail.\n\nDefault: " + setHead;
-    headTailInput.characters = 3;
-
-    headTailInput.onChange = function() {
-        headTailInput.text = headTailInput.text.replace(/[^0-9]/g, "");
-        restoreDefaultsButton.enabled = true;
-        infoText.enabled = true;
-    };
-    
-    // Gap between measurement lines and object
-    gapLabel = headTailGroup.add("statictext", undefined, "Gap:");
-    (gapSizeInput = headTailGroup.add("edittext", undefined, defaultGapSize)).helpTip = "Set gap size between measurement lines and object\n\nDefault: " + setGapSize;
-    gapSizeInput.characters = 3;
-
-    gapSizeInput.onChange = function() {
-        gapSizeInput.text = gapSizeInput.text.replace(/[^0-9.]/g, "");
-        restoreDefaultsButton.enabled = true;
-        infoText.enabled = true;
-    };
-    gapSizeInput.onDeactivate = function() {
-        // If first character is decimal point, don't error, but instead
-        // add leading zero to string.
-        if (gapSizeInput.text.charAt(0) == ".") {
-            gapSizeInput.text = "0" + gapSizeInput.text;
-            gapSizeInput.active = true;
-        }
-    }
-
-    // Stroke Width
-    strokeLabel = headTailGroup.add("statictext", undefined, "Stroke:");
-    (strokeInput = headTailGroup.add("edittext", undefined, defaultStroke)).helpTip = "Set width of stroke measurement lines\n\nDefault: " + setStroke;
-    strokeInput.characters = 3;
-
-    strokeInput.onChange = function() {
-        strokeInput.text = strokeInput.text.replace(/[^0-9.]/g, "");
-        restoreDefaultsButton.enabled = true;
-        infoText.enabled = true;
-    };
-    strokeInput.onDeactivate = function() {
-        // If first character is decimal point, don't error, but instead
-        // add leading zero to string.
-        if (strokeInput.text.charAt(0) == ".") {
-            strokeInput.text = "0" + strokeInput.text;
-            strokeInput.active = true;
-        }
-    }
 
     // Add decimal places box
-    decimalPlacesGroup = optionsPanel.add("group");
+    decimalPlacesGroup = labelsPanel.add("group");
     decimalPlacesGroup.orientation = "row";
+    decimalPlacesGroup.spacing = 5;
     decimalPlacesLabel = decimalPlacesGroup.add("statictext", undefined, "Decimals:"); // Num. of decimal places displayed:
     (decimalPlacesInput = decimalPlacesGroup.add("edittext", undefined, defaultDecimals)).helpTip = "Enter the desired number of decimal places to\ndisplay in the label dimensions.\n\nDefault: " + setDecimals;
     decimalPlacesInput.characters = 4;
@@ -366,7 +307,7 @@ if (app.documents.length > 0) {
     };
 
     // Show/hide units
-    (units = optionsPanel.add("checkbox", undefined, "Include units label(s)")).helpTip = "When checked, inserts the units label alongside\nthe outputted dimension.\nExample: 220 px";
+    (units = labelsPanel.add("checkbox", undefined, "Include units label(s)")).helpTip = "When checked, inserts the units label alongside\nthe outputted dimension.\nExample: 220 px";
     units.value = defaultUnits;
     units.onClick = function() {
         if (units.value == false) {
@@ -377,7 +318,7 @@ if (app.documents.length > 0) {
     };
 
     // Custom Units box
-    customUnitsGroup = optionsPanel.add("group");
+    customUnitsGroup = labelsPanel.add("group");
     customUnitsGroup.orientation = "row";
 
     // Add options panel checkboxes
@@ -393,7 +334,7 @@ if (app.documents.length > 0) {
     };
 
     // Custom Units box
-    // customUnitsGroup = optionsPanel.add("group");
+    // customUnitsGroup = labelsPanel.add("group");
     // customUnitsGroup.orientation = "row";
     // customUnitsLabel = customUnitsGroup.add("statictext", undefined, "Custom Units Label:");
     (customUnitsInput = customUnitsGroup.add("edittext", undefined, defaultCustomUnits)).helpTip = "Enter the string to display after the dimension \nnumber when using a custom scale.\n\nDefault: " + setCustomUnits;
@@ -405,25 +346,143 @@ if (app.documents.length > 0) {
         customUnitsInput.text = customUnitsInput.text.replace(/[^ a-zA-Z]/g, "");
     };
 
+
+    
+    //
+    // Lines Panel
+    // ===========================
+    // linesPanel = specifyDialogBox.add("panel", undefined, "OPTIONS");
+    // linesPanel.orientation = "column";
+    // linesPanel.alignment = "fill";
+    // linesPanel.margins = 16;
+    // linesPanel.spacing = 8;
+    // linesPanel.alignChildren = "left";
+
+    // Size measurement head
+    headTailGroup = labelsPanel.add("group");
+    headTailGroup.orientation = "row";
+    headTailGroup.spacing = 5;
+    headTailLabel = headTailGroup.add("statictext", undefined, "Head & Tail:");
+    (headTailInput = headTailGroup.add("edittext", undefined, defaultHeadTail)).helpTip = "Set size of measurement head & tail.\n\nDefault: " + setHead;
+    headTailInput.characters = 3;
+    heaedUnitsLabel = headTailGroup.add("statictext", undefined, fontUnitsLabelText);
+
+    headTailInput.onChange = function() {
+        headTailInput.text = headTailInput.text.replace(/[^0-9]/g, "");
+        restoreDefaultsButton.enabled = true;
+        infoText.enabled = true;
+    };
+    
+    // Gap between measurement lines and object
+    spacer01 = headTailGroup.add("statictext", undefined, "  ");
+    gapLabel = headTailGroup.add("statictext", undefined, "Gap:");
+    (gapSizeInput = headTailGroup.add("edittext", undefined, defaultGapSize)).helpTip = "Set gap size between measurement lines and object\n\nDefault: " + setGapSize;
+    gapSizeInput.characters = 3;
+    gapUnitsLabel = headTailGroup.add("statictext", undefined, fontUnitsLabelText);
+
+    gapSizeInput.onChange = function() {
+        gapSizeInput.text = gapSizeInput.text.replace(/[^0-9.]/g, "");
+        restoreDefaultsButton.enabled = true;
+        infoText.enabled = true;
+    };
+    gapSizeInput.onDeactivate = function() {
+        // If first character is decimal point, don't error, but instead
+        // add leading zero to string.
+        if (gapSizeInput.text.charAt(0) == ".") {
+            gapSizeInput.text = "0" + gapSizeInput.text;
+            gapSizeInput.active = true;
+        }
+    }
+
+    // Stroke Group
+    strokeGroup = labelsPanel.add("group");
+    strokeGroup.orientation = "row";
+    strokeGroup.spacing = 5;
+    // Stroke Width
+    strokeLabel = strokeGroup.add("statictext", undefined, "Stroke:");
+    (strokeInput = strokeGroup.add("edittext", undefined, defaultStroke)).helpTip = "Set width of stroke measurement lines\n\nDefault: " + setStroke;
+    strokeInput.characters = 3;
+    strokeUnitsLabel = strokeGroup.add("statictext", undefined, fontUnitsLabelText);
+
+    strokeInput.onChange = function() {
+        strokeInput.text = strokeInput.text.replace(/[^0-9.]/g, "");
+        restoreDefaultsButton.enabled = true;
+        infoText.enabled = true;
+    };
+    strokeInput.onDeactivate = function() {
+        // If first character is decimal point, don't error, but instead
+        // add leading zero to string.
+        if (strokeInput.text.charAt(0) == ".") {
+            strokeInput.text = "0" + strokeInput.text;
+            strokeInput.active = true;
+        }
+    }
+
+    // Add Color Lines
+    colLines = strokeGroup.add("statictext", undefined, "");
+    var colLinesBtn = strokeGroup.add('iconbutton', undefined, undefined, {
+        name: 'colLinesBtn',
+        style: 'toolbutton'
+    });
+    colLinesBtn.size = [70, 20];
+    var colLinesRGB = [(parseInt(defaultLinesColorRed)/255), (parseInt(defaultLinesColorGreen)/255), (parseInt(defaultLinesColorBlue)/255)];
+    colLinesBtn.fillBrush = colLinesBtn.graphics.newBrush(colLinesBtn.graphics.BrushType.SOLID_COLOR, colLinesRGB, 1);
+    // colLinesBtn.text = "click";
+    colLinesBtn.textPen = colLinesBtn.graphics.newPen(colLinesBtn.graphics.PenType.SOLID_COLOR, [1, 1, 1], 1);
+    colLinesBtn.onDraw = customDraw;
+    colLinesBtn.helpTip = "Set a color to use for dimension Line(s).";
+
+    var colLinesInputRed = defaultLinesColorRed;
+    var colLinesInputGreen = defaultLinesColorGreen;
+    var colLinesInputBlue = defaultLinesColorBlue;
+    var resultLinesColor = colLinesRGB.toString();
+    var colLinesSet = false;
+
+    function setLinesColor(resultLinesColor) {
+        var Red = Math.round(resultLinesColor[0] * 255);
+        var Green = Math.round(resultLinesColor[1] * 255);
+        var Blue = Math.round(resultLinesColor[2] * 255);
+        colLinesInputRed = Red.toString();
+        colLinesInputGreen = Green.toString();
+        colLinesInputBlue = Blue.toString();
+        return [colLinesInputRed,colLinesInputGreen,colLinesInputBlue] 
+    }
+
+    colLinesBtn.onClick = function() {
+        colLinesSet = true;
+        resultLinesColor = colorPicker(colLinesRGB);
+        colLinesBtn.fillBrush = colLinesBtn.graphics.newBrush(colLinesBtn.graphics.BrushType.SOLID_COLOR, resultLinesColor);
+        colLinesBtn.text = "";
+        colLinesBtn.onDraw = customDraw;
+        // specifyDialogBox.update();
+        updatePanel(specifyDialogBox);
+        // app.refresh();
+        restoreDefaultsButton.enabled = true;
+        infoText.enabled = true;
+    }
+
+
     //
     // Restore Defaults Group
     // ===========================
     defaultsPanel = specifyDialogBox.add("panel", undefined, "RESTORE DEFAULTS");
     defaultsPanel.orientation = "column";
     defaultsPanel.alignment = "fill";
-    defaultsPanel.margins = 20;
+    defaultsPanel.margins = 16;
+    defaultsPanel.spacing = 8;
     defaultsPanel.alignChildren = "left";
 
     // Info text
-    infoText = defaultsPanel.add("statictext", undefined, "Options are persistent until application is closed.");
-    infoText.margins = 20;
+    infoText = defaultsPanel.add("statictext", undefined, "Options are persistent until app quit"); //application is closed.
+    infoText.margins = 16;
+    infoText.spacing = 8;
     // Disable to make text appear subtle
     infoText.enabled = false;
 
     // Reset options button
     restoreDefaultsButton = defaultsPanel.add("button", undefined, "Restore Defaults");
     restoreDefaultsButton.alignment = "left";
-    restoreDefaultsButton.enabled = (setFontSize != defaultFontSize || setRed != defaultColorRed || setGreen != defaultColorGreen || setBlue != defaultColorBlue || setHead != defaultHeadTail || setGapSize != defaultGapSize || setStroke != defaultStroke || setDecimals != defaultDecimals || setScale != defaultScale || setCustomUnits != defaultCustomUnits ? true : false);
+    restoreDefaultsButton.enabled = (setFontSize != defaultFontSize || setLabelRed != defaultLabelColorRed || setLabelGreen != defaultLabelColorGreen || setLabelBlue != defaultLabelColorBlue || setLinesRed != defaultLinesColorRed || setLinesGreen != defaultLinesColorGreen || setLinesBlue != defaultLinesColorBlue || setHead != defaultHeadTail || setGapSize != defaultGapSize || setStroke != defaultStroke || setDecimals != defaultDecimals || setScale != defaultScale || setCustomUnits != defaultCustomUnits ? true : false);
     restoreDefaultsButton.onClick = function() {
         restoreDefaults();
     };
@@ -431,9 +490,12 @@ if (app.documents.length > 0) {
     function restoreDefaults() {
         units.value = setUnits;
         fontSizeInput.text = setFontSize;
-        colorInputRed = setRed;
-        colorInputGreen = setGreen;
-        colorInputBlue = setBlue;
+        colLabelInputRed = setLabelRed;
+        colLabelInputGreen = setLabelGreen;
+        colLabelInputBlue = setLabelBlue;
+        colLinesInputRed = setLinesRed;
+        colLinesInputGreen = setLinesGreen;
+        colLinesInputBlue = setLinesBlue;
         headTailInput.text = setHead;
         gapSizeInput.text = setGapSize;
         strokeInput.text = setStroke;
@@ -447,9 +509,12 @@ if (app.documents.length > 0) {
         // Unset environmental variables
         $.setenv("Specify_defaultUnits", "");
         $.setenv("Specify_defaultFontSize", "");
-        $.setenv("Specify_defaultColorRed", "");
-        $.setenv("Specify_defaultColorGreen", "");
-        $.setenv("Specify_defaultColorBlue", "");
+        $.setenv("Specify_defaultLabelColorRed", "");
+        $.setenv("Specify_defaultLabelColorGreen", "");
+        $.setenv("Specify_defaultLabelColorBlue", "");
+        $.setenv("Specify_defaultLinesColorRed", "");
+        $.setenv("Specify_defaultLinesColorGreen", "");
+        $.setenv("Specify_defaultLinesColorBlue", "");
         $.setenv("Specify_defaultHeadTail", "");
         $.setenv("Specify_defaultGapSize", "");
         $.setenv("Specify_defaultStroke", "");
@@ -458,9 +523,12 @@ if (app.documents.length > 0) {
         $.setenv("Specify_defaultUseCustomUnits", "");
         $.setenv("Specify_defaultCustomUnits", "");
 
-        colorBtn.text = "click";
-        colorBtn.fillBrush = colorBtn.graphics.newBrush(colorBtn.graphics.BrushType.SOLID_COLOR, [setRed,setGreen,setBlue], 1);
-        colorBtn.onDraw = customDraw;
+        // colLabelBtn.text = "click";
+        colLabelBtn.fillBrush = colLabelBtn.graphics.newBrush(colLabelBtn.graphics.BrushType.SOLID_COLOR, [setLabelRed,setLabelGreen,setLabelBlue], 1);
+        colLabelBtn.onDraw = customDraw;
+        // colLinesBtn.text = "click";
+        colLinesBtn.fillBrush = colLinesBtn.graphics.newBrush(colLinesBtn.graphics.BrushType.SOLID_COLOR, [setLinesRed,setLinesGreen,setLinesBlue], 1);
+        colLinesBtn.onDraw = customDraw;
         // updatePanel(specifyDialogBox); // Force redraw dialog
     };
 
@@ -512,8 +580,11 @@ if (app.documents.length > 0) {
         specsLayer.name = "SPECS";
     }
 
-    // Measurement line and text color in RGB
-    var color = new RGBColor;
+    // Measurement text color in RGB
+    var colLabel = new RGBColor;
+
+    // Measurement lines color in RGB
+    var colLines = new RGBColor;
 
     // Declare global decimals var
     var decimals;
@@ -551,34 +622,44 @@ if (app.documents.length > 0) {
         // Set bool for numeric vars
         var validFontSize = /^[0-9]{1,3}(\.[0-9]{1,3})?$/.test(fontSizeInput.text);
 
-        // var validRedColor = /^[0-9]{1,3}$/.test(colorInputRed.text) && parseInt(colorInputRed.text) >= 0 && parseInt(colorInputRed.text) <= 255;
-        // var validGreenColor = /^[0-9]{1,3}$/.test(colorInputGreen.text) && parseInt(colorInputGreen.text) >= 0 && parseInt(colorInputRed.text) <= 255;
-        // var validBlueColor = /^[0-9]{1,3}$/.test(colorInputBlue.text) && parseInt(colorInputBlue.text) >= 0 && parseInt(colorInputBlue.text) <= 255;
-        // var rgbCol = setColor(resultColor);
-        // alert(setColor(resultColor))
-        // alert(setColor(resultColor)[1])
-        // alert(colorSet)
-        if (colorSet) {
-            colorInputRed = setColor(resultColor)[0];
-            colorInputGreen = setColor(resultColor)[1];
-            colorInputBlue = setColor(resultColor)[2];
+        if (colLabelSet) {
+            colLabelInputRed = setLabelColor(resultLabelColor)[0];
+            colLabelInputGreen = setLabelColor(resultLabelColor)[1];
+            colLabelInputBlue = setLabelColor(resultLabelColor)[2];
         }
-        var validRedColor = /^[0-9]{1,3}$/.test(colorInputRed) && colorInputRed >= 0 && colorInputRed <= 255;
-        var validGreenColor = /^[0-9]{1,3}$/.test(colorInputGreen) && colorInputGreen >= 0 && colorInputRed <= 255;
-        var validBlueColor = /^[0-9]{1,3}$/.test(colorInputBlue) && colorInputBlue >= 0 && colorInputBlue <= 255;
+        var validLabelRedColor = /^[0-9]{1,3}$/.test(colLabelInputRed) && colLabelInputRed >= 0 && colLabelInputRed <= 255;
+        var validLabelGreenColor = /^[0-9]{1,3}$/.test(colLabelInputGreen) && colLabelInputGreen >= 0 && colLabelInputRed <= 255;
+        var validLabelBlueColor = /^[0-9]{1,3}$/.test(colLabelInputBlue) && colLabelInputBlue >= 0 && colLabelInputBlue <= 255;
         // If colors are valid, set variables
-        if (validRedColor && validGreenColor && validBlueColor) {
-            // color.red = colorInputRed.text;
-            // color.green = colorInputGreen.text;
-            // color.blue = colorInputBlue.text;
-            color.red = colorInputRed;
-            color.green = colorInputGreen;
-            color.blue = colorInputBlue;
+        if (validLabelRedColor && validLabelGreenColor && validLabelBlueColor) {
+            colLabel.red = colLabelInputRed;
+            colLabel.green = colLabelInputGreen;
+            colLabel.blue = colLabelInputBlue;
             // Set environmental variables
-            $.setenv("Specify_defaultColorRed", color.red);
-            $.setenv("Specify_defaultColorGreen", color.green);
-            $.setenv("Specify_defaultColorBlue", color.blue);
-            colorSet = false;
+            $.setenv("Specify_defaultLabelColorRed", colLabel.red);
+            $.setenv("Specify_defaultLabelColorGreen", colLabel.green);
+            $.setenv("Specify_defaultLabelColorBlue", colLabel.blue);
+            colLabelSet = false;
+        }
+
+        if (colLinesSet) {
+            colLinesInputRed = setLinesColor(resultLinesColor)[0];
+            colLinesInputGreen = setLinesColor(resultLinesColor)[1];
+            colLinesInputBlue = setLinesColor(resultLinesColor)[2];
+        }
+        var validLinesRedColor = /^[0-9]{1,3}$/.test(colLinesInputRed) && colLinesInputRed >= 0 && colLinesInputRed <= 255;
+        var validLinesGreenColor = /^[0-9]{1,3}$/.test(colLinesInputGreen) && colLinesInputGreen >= 0 && colLinesInputRed <= 255;
+        var validLinesBlueColor = /^[0-9]{1,3}$/.test(colLinesInputBlue) && colLinesInputBlue >= 0 && colLinesInputBlue <= 255;
+        // If colors are valid, set variables
+        if (validLinesRedColor && validLinesGreenColor && validLinesBlueColor) {
+            colLines.red = colLinesInputRed;
+            colLines.green = colLinesInputGreen;
+            colLines.blue = colLinesInputBlue;
+            // Set environmental variables
+            $.setenv("Specify_defaultLinesColorRed", colLines.red);
+            $.setenv("Specify_defaultLinesColorGreen", colLines.green);
+            $.setenv("Specify_defaultLinesColorBlue", colLines.blue);
+            colLinesSet = false;
         }
 
         var validHead = /^[0-9]{1,2}$/.test(headTailInput.text);
@@ -630,14 +711,14 @@ if (app.documents.length > 0) {
             beep();
             alert("Font size must be greater than 0.001.");
             fontSizeInput.active = true;
-        } else if (!validRedColor || !validGreenColor || !validBlueColor) {
+        } else if (!validLabelRedColor || !validLabelGreenColor || !validLabelBlueColor) {
             // If RGB inputs are not numeric
             beep();
-            alert("Please enter a valid RGB color.");
-            colorInputRed.active = true;
-            colorInputRed.text = setRed;
-            colorInputGreen.text = setGreen;
-            colorInputBlue.text = setBlue;
+            alert("Please enter a valid RGB color for the Label.");
+            // colLabelInputRed.active = true;
+            // colLabelInputRed.text = setLabelRed;
+            // colLabelInputGreen.text = setLabelGreen;
+            // colLabelInputBlue.text = setLabelBlue;
         } else if (!validHead) {
             // If inputs are not numeric
             beep();
@@ -804,10 +885,10 @@ if (app.documents.length > 0) {
 
             // Create text label
             if (where == "Top") {
-                var t = specLabel(w, (a + b) / 2, lines[0][1][1], color);
+                var t = specLabel(w, (a + b) / 2, lines[0][1][1], colLabel);
                 t.top += t.height;
             } else {
-                var t = specLabel(w, (a + b) / 2, lines[0][0][1], color);
+                var t = specLabel(w, (a + b) / 2, lines[0][0][1], colLabel);
                 t.top -= sizeUnit;
             }
             t.left -= t.width / 2;
@@ -827,13 +908,13 @@ if (app.documents.length > 0) {
 
             // Create text label
             if (where == "Left") {
-                var t = specLabel(h, lines[0][1][0], (a + b) / 2, color);
+                var t = specLabel(h, lines[0][1][0], (a + b) / 2, colLabel);
                 t.left -= t.width;
                 t.rotate(90, true, false, false, false, Transformation.BOTTOMRIGHT);
                 t.top += t.width;
                 t.top += t.height / 2;
             } else {
-                var t = specLabel(h, lines[0][1][0], (a + b) / 2, color);
+                var t = specLabel(h, lines[0][1][0], (a + b) / 2, colLabel);
                 t.rotate(-90, true, false, false, false, Transformation.BOTTOMLEFT);
                 t.top += t.width;
                 t.top += t.height / 2;
@@ -847,7 +928,7 @@ if (app.documents.length > 0) {
             var p = doc.pathItems.add();
             p.setEntirePath(lines[i]);
             p.strokeDashes = []; // Prevent dashed SPEC lines
-            setLineStyle(p, color, strWidth);
+            setLineStyle(p, colLines, strWidth);
             specgroup.push(p);
         }
 
@@ -923,7 +1004,7 @@ if (app.documents.length > 0) {
     //
     // Create a text label that specify the dimension
     // ===========================
-    function specLabel(val, x, y, color) {
+    function specLabel(val, x, y, colLabel) {
 
         var t = doc.textFrames.add();
         // Get font size from specifyDialogBox.fontSizeInput
@@ -942,7 +1023,7 @@ if (app.documents.length > 0) {
 
         t.textRange.characterAttributes.size = labelFontInUnits;
         t.textRange.characterAttributes.alignment = StyleRunAlignmentType.center;
-        t.textRange.characterAttributes.fillColor = color;
+        t.textRange.characterAttributes.fillColor = colLabel;
 
         // Conversions : http://wwwimages.adobe.com/content/dam/Adobe/en/devnet/illustrator/sdk/CC2014/Illustrator%20Scripting%20Guide.pdf
         // UnitValue object (page 230): http://wwwimages.adobe.com/content/dam/Adobe/en/devnet/scripting/pdfs/javascript_tools_guide.pdf
@@ -1016,10 +1097,10 @@ if (app.documents.length > 0) {
         }
     };
 
-    function setLineStyle(path, color, strWidth) {
+    function setLineStyle(path, colLines, strWidth) {
         path.filled = false;
         path.stroked = true;
-        path.strokeColor = color;
+        path.strokeColor = colLines;
         path.strokeWidth = strWidth;
         return path;
     };
