@@ -88,7 +88,7 @@ if (app.documents.length > 0) {
     scalePanel.margins = 16;
     scalePanel.spacing = 8;
     scalePanel.alignChildren = "left";
-    customScaleInfo = scalePanel.add("statictext", undefined, "Define the scale of the artwork/document. Example: 250 units at 1/4 scale displays as 1000", {multiline:true});
+    customScaleInfo = scalePanel.add("statictext", undefined, "Define the scale of the artwork document. Example: 250 units at 1/4 scale displays as 1000.", {multiline:true});
     customScaleInfo.preferredSize.width = 250; 
     // customScaleInfo2 = scalePanel.add("statictext", undefined, "Example: 250 units at 1/4 scale displays as 1000");
 
